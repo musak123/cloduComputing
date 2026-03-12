@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: p1-exp1b-job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: p1-exp1b
+          image: clodu/p1-experiments:latest
+          command: ["python", "scripts/p1/train_exp1b.py"]
+          resources:
+            limits:
+              cpu: "4"
+              memory: "8Gi"

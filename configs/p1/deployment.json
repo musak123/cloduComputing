@@ -1,0 +1,16 @@
+{
+  "service_name": "p1-experiment-runner",
+  "image": "clodu/p1-experiments:latest",
+  "entrypoint": "python scripts/p1/train_exp1a.py",
+  "artifacts": [
+    "results/p1/exp1a_sequential_raw.csv",
+    "results/p1/exp1a_joint_raw.csv",
+    "results/p1/exp1b_transfer_raw.csv",
+    "results/p1/exp1a_summary.json"
+  ],
+  "resources": {
+    "gpu": 1,
+    "cpu": "8",
+    "memory": "32Gi"
+  }
+}
