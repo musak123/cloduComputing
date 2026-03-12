@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+results/p1/*.csv
+results/p1/*.json
+results/p1/*.tar.gz

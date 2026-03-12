@@ -1,0 +1,10 @@
+{
+  "geta_repo": "/tmp/geta",
+  "output_dir": "results/p1",
+  "steps": 20,
+  "seed": 42,
+  "target_group_sparsity": 0.5,
+  "min_bit_wt": 4,
+  "max_bit_wt": 16,
+  "dry_run": true
+}
