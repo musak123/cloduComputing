@@ -4,4 +4,4 @@ WORKDIR /app
 COPY . /app
 
 ENV PYTHONPATH=/app
-CMD ["python", "scripts/p1/train_exp1a.py"]
+CMD ["python", "scripts/p1/run_full_p1_benchmark.py"]

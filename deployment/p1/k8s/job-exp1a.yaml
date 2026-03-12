@@ -9,7 +9,7 @@ spec:
       containers:
         - name: p1-exp1a
           image: clodu/p1-experiments:latest
-          command: ["python", "scripts/p1/train_exp1a.py"]
+          command: ["python", "scripts/p1/run_full_p1_benchmark.py"]
           resources:
             limits:
               nvidia.com/gpu: 1

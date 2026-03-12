@@ -27,6 +27,17 @@ python scripts/p1/train_exp1b.py \
   --config configs/p1/exp1b_transfer.json
 ```
 
+
+### Full benchmark (ALCAF vs GETA/HAPE baseline + transfer report)
+
+```bash
+python scripts/p1/run_full_p1_benchmark.py \
+  --seq-config configs/p1/exp1a_sequential.json \
+  --joint-config configs/p1/exp1a_joint.json \
+  --transfer-config configs/p1/exp1b_transfer.json \
+  --out-dir results/p1
+```
+
 ### Build deployment bundle
 
 ```bash
