@@ -6,6 +6,9 @@
     "results/p1/exp1a_sequential_raw.csv",
     "results/p1/exp1a_joint_raw.csv",
     "results/p1/exp1a_run_summary.csv",
+    "results/p1/exp1a_summary.json",
+    "results/p1/exp1b_transfer_raw.csv",
+    "results/p1/exp1b_summary.json",
     "results/p1/benchmark_report.json"
   ],
   "resources": {

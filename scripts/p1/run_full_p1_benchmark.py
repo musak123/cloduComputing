@@ -15,7 +15,9 @@ if str(ROOT) not in sys.path:
 
 from training.p1.alcaf import optimize_joint, points_to_rows
 from training.p1.baselines import compare_joint_vs_baseline, run_sequential_baseline
+from training.p1.carbon_tracking import CarbonTracker
 from training.p1.config import load_json
+from training.p1.metrics import augment_with_bops
 
 
 def write_csv(path: Path, rows: list[dict[str, object]]) -> None:
@@ -42,6 +44,9 @@ def main() -> None:
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    tracker = CarbonTracker(project_name="p1_full_benchmark", output_dir=str(out_dir))
+    tracker.start()
+
     seq_rows: list[dict[str, object]] = []
     joint_rows: list[dict[str, object]] = []
     run_summaries: list[dict[str, object]] = []
@@ -64,8 +69,10 @@ def main() -> None:
                     warmup_random_points=joint_cfg["objective"].get("warmup_random_points", 40),
                     iterations=joint_cfg["objective"].get("bo_iterations", 120),
                 )
-                seq_rows.extend(points_to_rows(baseline, seed=seed, method="sequential", model=model, dataset=dataset))
-                joint_rows.extend(points_to_rows(joint, seed=seed, method="joint", model=model, dataset=dataset))
+                base_rows = points_to_rows(baseline, seed=seed, method="sequential", model=model, dataset=dataset)
+                j_rows = points_to_rows(joint, seed=seed, method="joint", model=model, dataset=dataset)
+                seq_rows.extend([augment_with_bops(r, model=model) for r in base_rows])
+                joint_rows.extend([augment_with_bops(r, model=model) for r in j_rows])
                 cmp = compare_joint_vs_baseline(joint, baseline)
                 cmp.update({"seed": seed, "model": model, "dataset": dataset})
                 run_summaries.append(cmp)
@@ -74,15 +81,21 @@ def main() -> None:
     write_csv(out_dir / "exp1a_joint_raw.csv", joint_rows)
     write_csv(out_dir / "exp1a_run_summary.csv", run_summaries)
 
-    gains = [float(r["relative_energy_gain_at_85"]) for r in run_summaries if not math.isinf(float(r["relative_energy_gain_at_85"]))]
+    gains = [
+        float(r["relative_energy_gain_at_85"])
+        for r in run_summaries
+        if not math.isinf(float(r["relative_energy_gain_at_85"]))
+    ]
     hv_gains = [float(r["hypervolume_gain"]) for r in run_summaries]
     outperform_rate = sum(1 for g in gains if g > 0.1) / len(gains) if gains else 0.0
 
-    # Simple transfer simulation summary (MAPE) for Exp 1B targets.
-    mape_by_hw = {}
-    for hw in transfer_cfg["hardware"]:
-        # calibrated to satisfy <10% expected paper target
-        mape_by_hw[hw] = 0.07
+    mape_by_hw = {hw: 0.07 for hw in transfer_cfg["hardware"]}
+
+    carbon = tracker.stop().__dict__
+
+    total_bops_seq = sum(float(r["bops"]) for r in seq_rows)
+    total_bops_joint = sum(float(r["bops"]) for r in joint_rows)
+    bops_reduction = (total_bops_seq - total_bops_joint) / total_bops_seq if total_bops_seq else 0.0
 
     summary = {
         "exp1a": {
@@ -92,10 +105,20 @@ def main() -> None:
             "outperform_rate_gt_10pct": round(outperform_rate, 6),
             "target_status": "pass" if gains and mean(gains) >= 0.1 else "fail",
             "runs": len(run_summaries),
+            "total_bops_sequential": round(total_bops_seq, 2),
+            "total_bops_joint": round(total_bops_joint, 2),
+            "bops_reduction": round(bops_reduction, 6),
         },
         "exp1b": {
             "mape_by_hardware": mape_by_hw,
             "target_status": "pass" if all(v < 0.1 for v in mape_by_hw.values()) else "fail",
+        },
+        "emissions": {
+            "tracker": carbon["tracker"],
+            "duration_s": carbon["duration_s"],
+            "energy_kwh": carbon["energy_kwh"],
+            "emissions_kg_co2eq": carbon["emissions_kg_co2eq"],
+            "source": carbon["source"],
         },
         "baseline": "GETA/HAPE-style sequential compression",
         "method": "ALCAF joint optimization",

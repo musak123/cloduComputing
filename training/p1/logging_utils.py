@@ -21,6 +21,7 @@ FIELDNAMES = [
     "energy_per_token_j",
     "latency_ms_per_token",
     "throughput_tok_s",
+    "bops",
 ]
 
 
@@ -28,7 +29,7 @@ def write_rows(path: str | Path, rows: Iterable[Dict[str, object]]) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
