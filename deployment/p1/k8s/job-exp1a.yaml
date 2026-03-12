@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: p1-exp1a-job
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: p1-exp1a
+          image: clodu/p1-experiments:latest
+          command: ["python", "scripts/p1/run_full_p1_benchmark.py"]
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+              cpu: "8"
+              memory: "32Gi"

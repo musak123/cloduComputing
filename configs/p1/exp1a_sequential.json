@@ -1,0 +1,15 @@
+{
+  "experiment_id": "exp1a_sequential",
+  "output_dir": "results/p1",
+  "hardware": ["A800", "RTX4090"],
+  "models": ["LLaMA-2-7B", "Bloom-7B", "Pythia-6.9B"],
+  "datasets": ["SQuAD", "IMDb"],
+  "seeds": [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  "kappa": [0.0, 0.3, 0.5, 0.7],
+  "precision": ["FP16", "INT8", "INT4"],
+  "routing": ["dense", "MoE-2", "MoE-4"],
+  "objective": {
+    "lambda_energy": 0.7,
+    "lambda_accuracy": 0.3
+  }
+}
