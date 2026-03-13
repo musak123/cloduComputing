@@ -1,0 +1,18 @@
+{
+  "service_name": "p1-experiment-runner",
+  "image": "clodu/p1-experiments:latest",
+  "entrypoint": "python scripts/p1/run_full_p1_benchmark.py",
+  "artifacts": [
+    "results/p1/exp1a_sequential_raw.csv",
+    "results/p1/exp1a_joint_raw.csv",
+    "results/p1/exp1a_run_summary.csv",
+    "results/p1/benchmark_report.json",
+    "results/p1/emissions_tracking.csv",
+    "results/p1/geta_baseline_report.json"
+  ],
+  "resources": {
+    "gpu": 1,
+    "cpu": "8",
+    "memory": "32Gi"
+  }
+}
